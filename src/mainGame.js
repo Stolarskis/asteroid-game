@@ -54,6 +54,7 @@ class mainGame extends Phaser.Scene {
         this.planet_big.setScale(4);
         this.planet_big.setScrollFactor(0);
 
+        /**
         //Create player in the center of the world 
         this.player = this.physics.add.sprite(this.worldWidth / 2, this.worldHeight / 2, "player_sprite");
         //Double the size + Play the player idle anim
@@ -70,13 +71,54 @@ class mainGame extends Phaser.Scene {
         this.dampeners = true;
         this.player.setMaxVelocity(this.playerMaxVelocity);
         this.player.setCollideWorldBounds(true);
+        */
 
         //Camera Setup
         this.myCam = this.cameras.main;
         //Scenes are infinite, so we set boundaries with the camera and the player
         this.myCam.setBounds(0, 0, this.worldWidth, this.worldHeight);
         //Tell the camera to follow the player
-        this.myCam.startFollow(this.player);
+        
+        //this.myCam.startFollow(this.player);
+
+        //Experimental socket.io
+        //var self = this;
+        this.socket = io();
+        var self = this;
+
+        this.players = this.physics.add.group()
+
+        this.socket.on('currentPlayers', function (players) {
+            Object.keys(players).forEach(function (id) {
+                //console.log(id)
+                //console.log(players[id]);
+                if (players[id].playerId === self.socket.id) {
+                    //Here is where we would init player
+                    self.addPlayer(self,players[id]);
+                }else{
+                    self.addOtherPlayers(self,players[id]);
+                }
+            });
+        });
+
+        //When a new player connects, our server will send us just that players data
+        //We add that player to the players group and reander it via the `addPlayer` function
+        this.socket.on('newPlayer', function(player){
+            self.addOtherPlayers(self, player)
+        });
+
+        //Upon receiving a disconnect event, we check the given player id in our player group. 
+        //If we find it (we should always find it) then we delete that player's object from the group/game
+        this.socket.on('disconnect', function (playerId) {
+            self.players.getChildren().forEach(function (players) {
+                if (playerId === players.playerId) {
+                    players.destroy();
+                }
+                else{
+                    console.error("Player does not exist");
+                }
+            });
+        });
     }
 
     update() {
@@ -99,7 +141,7 @@ class mainGame extends Phaser.Scene {
             //Decelerate
             this.physics.velocityFromRotation(this.player.rotation, -250, this.player.body.acceleration);
         }
-        else{
+        else {
             this.player.setAcceleration(0);
         }
     }
@@ -116,10 +158,10 @@ class mainGame extends Phaser.Scene {
     }
 
     //Shooting Controller
-    shootingController(){
+    shootingController() {
         //Working solution to not allowing the player to just hold the down key.
         //Later on I want to implement a recharging ammo system. But thats for a later day
-        if (Phaser.Input.Keyboard.JustDown(this.cursorKeys.space)){
+        if (Phaser.Input.Keyboard.JustDown(this.cursorKeys.space)) {
             new Bolt(this);
         }
     }
@@ -127,10 +169,10 @@ class mainGame extends Phaser.Scene {
     //Toggles player drag on and off 
     inertiaDampenerController() {
         if (this.cursorKeys.shift.isDown) {
-            if(this.dampeners){
+            if (this.dampeners) {
                 this.dampeners = false;
                 this.player.setDrag(0);
-            } else{
+            } else {
                 this.dampeners = true;
                 this.player.setDrag(0.99);
             }
@@ -140,13 +182,48 @@ class mainGame extends Phaser.Scene {
     //Controls tilesprites scroll factor. 
     //Parallax functinos by moving objects (tilesprites) across the screen, based on camera movement, at different speeds. 
     //Objects supposed to be closer up move faster while objects supposed to be far away move slower. This creates a depth effect.
-    parallaxController(){
+    parallaxController() {
         this.planet_far.tilePositionX = this.myCam.scrollX * 0.05;
         this.planet_far.tilePositionY = this.myCam.scrollY * 0.05;
         this.planet_ring.tilePositionX = this.myCam.scrollX * 0.1;
         this.planet_ring.tilePositionY = this.myCam.scrollY * 0.1;
         this.planet_big.tilePositionX = this.myCam.scrollX * 0.22;
         this.planet_big.tilePositionY = this.myCam.scrollY * 0.22;
+    }
+
+    addPlayer(self, playerInfo) {
+        //Player added in here
+        self.player = this.physics.add.sprite(playerInfo.x, playerInfo.y, "player_sprite");
+        //Double the size + Play the player idle anim
+        self.player.setScale(2);
+        self.player.play("playerIdle_anim");
+
+        //Player input/movement settings 
+        self.cursorKeys = this.input.keyboard.createCursorKeys();
+        //this.cursorKeys.space.setEmitOnRepeat(true);
+        //Drag will use a damping effect rather than a linear approach. Much smoother brakes.
+        self.player.setDamping(true);
+        self.player.setDrag(this.playerDrag);
+        //Used for the toggle in the dampener function
+        self.dampeners = true;
+        self.player.setMaxVelocity(this.playerMaxVelocity);
+        self.player.setCollideWorldBounds(true);
+
+        self.players.add(self.ship)
+
+        this.myCam.startFollow(this.player);
+    }
+
+    addOtherPlayers(self, playerInfo) {
+        const otherPlayer = self.add.sprite(playerInfo.x, playerInfo.y, 'player_sprite').setOrigin(0.5, 0.5).setDisplaySize(53, 40);
+        otherPlayer.play("playerIdle_anim");
+        if (playerInfo.team === 'blue') {
+            otherPlayer.setTint(0x0000ff);
+        } else {
+            otherPlayer.setTint(0xff0000);
+        }
+        otherPlayer.playerId = playerInfo.playerId;
+        self.players.add(otherPlayer);
     }
 }
 

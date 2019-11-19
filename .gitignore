@@ -2,3 +2,4 @@ node_modules
 src/assets/gui
 src/assets/background/space/*.zip
 src/assets/sprites/*.zip
+dist

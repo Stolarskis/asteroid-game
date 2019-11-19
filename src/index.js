@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import Socket from "socket.io-client"
 import mainGame from "./mainGame.js"
 import mainMenu from "./mainMenu.js"
 

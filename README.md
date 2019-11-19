@@ -2,8 +2,13 @@
 
 ## Build Steps
 
+### To Start up the development server
+
 1. 'npm install'
 2. 'npm start'
+
+### To 
+
 
 ## Assets Sources
 
