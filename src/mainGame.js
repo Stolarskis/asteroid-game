@@ -73,20 +73,18 @@ class mainGame extends Phaser.Scene {
         this.player.setCollideWorldBounds(true);
         */
 
+        this.cursorKeys = this.input.keyboard.createCursorKeys();
         //Camera Setup
         this.myCam = this.cameras.main;
         //Scenes are infinite, so we set boundaries with the camera and the player
         this.myCam.setBounds(0, 0, this.worldWidth, this.worldHeight);
-        //Tell the camera to follow the player
-        
-        //this.myCam.startFollow(this.player);
 
         //Experimental socket.io
         //var self = this;
+        this.players = this.physics.add.group()
         this.socket = io();
         var self = this;
 
-        this.players = this.physics.add.group()
 
         this.socket.on('currentPlayers', function (players) {
             Object.keys(players).forEach(function (id) {
@@ -122,11 +120,16 @@ class mainGame extends Phaser.Scene {
     }
 
     update() {
+        //The player is created upon a socket.io connection being made.
+        //It is possible for the these functions to fire without the player being created
+        //Causing the game to crash, this is at best a hacky solution
+        if(this.player){
         this.speedController();
         this.directionController();
         this.inertiaDampenerController();
-        this.parallaxController();
         this.shootingController();
+        }
+        this.parallaxController();
     }
 
     //Main player movement functions
@@ -206,10 +209,10 @@ class mainGame extends Phaser.Scene {
         self.player.setDrag(this.playerDrag);
         //Used for the toggle in the dampener function
         self.dampeners = true;
+        self.players.add(self.player);
         self.player.setMaxVelocity(this.playerMaxVelocity);
         self.player.setCollideWorldBounds(true);
 
-        self.players.add(self.ship)
 
         this.myCam.startFollow(this.player);
     }
