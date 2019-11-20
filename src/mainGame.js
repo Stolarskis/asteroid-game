@@ -117,6 +117,15 @@ class mainGame extends Phaser.Scene {
                 }
             });
         });
+
+        this.socket.on('playerMoved', function (playerInfo) {
+            self.players.getChildren().forEach(function (otherPlayer) {
+                if (playerInfo.playerId === otherPlayer.playerId) {
+                    otherPlayer.setRotation(playerInfo.rotation);
+                    otherPlayer.setPosition(playerInfo.x, playerInfo.y);
+                }
+            });
+        });
     }
 
     update() {
@@ -128,6 +137,7 @@ class mainGame extends Phaser.Scene {
         this.directionController();
         this.inertiaDampenerController();
         this.shootingController();
+        this.updatePlayerMovement();
         }
         this.parallaxController();
     }
@@ -213,6 +223,12 @@ class mainGame extends Phaser.Scene {
         self.player.setMaxVelocity(this.playerMaxVelocity);
         self.player.setCollideWorldBounds(true);
 
+        this.player.oldPosition = {
+        x: this.player.x,
+        y: this.player.y,
+        rotation: this.player.rotation
+        };
+
 
         this.myCam.startFollow(this.player);
     }
@@ -227,6 +243,25 @@ class mainGame extends Phaser.Scene {
         }
         otherPlayer.playerId = playerInfo.playerId;
         self.players.add(otherPlayer);
+    }
+
+    updatePlayerMovement(){
+        let x = this.player.x;
+        let y = this.player.y;
+        let r = this.player.r;
+
+        if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y || r !== this.player.oldPosition.rotation)) {
+            this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, rotation: this.player.rotation });
+        }
+ 
+        // save old position data
+        this.player.oldPosition = {
+        x: this.player.x,
+        y: this.player.y,
+        rotation: this.player.rotation
+};
+
+
     }
 }
 
