@@ -207,6 +207,9 @@ class mainGame extends Phaser.Scene {
     addPlayer(self, playerInfo) {
         //Player added in here
         self.player = this.physics.add.sprite(playerInfo.x, playerInfo.y, "player_sprite");
+        self.player.debugShowVelocity = true;
+        self.player;
+        self.player.setDebug(true,true,true);
         //Double the size + Play the player idle anim
         self.player.setScale(2);
         self.player.play("playerIdle_anim");
@@ -246,22 +249,32 @@ class mainGame extends Phaser.Scene {
     }
 
     updatePlayerMovement(){
+        /**
         let x = this.player.x;
         let y = this.player.y;
         let r = this.player.r;
+        let v = this.player.body.velocity;
+        let av = this.player.body.angularVelocity;
+        */
 
-        if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y || r !== this.player.oldPosition.rotation)) {
-            this.socket.emit('playerMovement', { x: this.player.x, y: this.player.y, rotation: this.player.rotation });
-        }
+        //if (this.player.oldPosition && (x !== this.player.oldPosition.x || y !== this.player.oldPosition.y || r !== this.player.oldPosition.rotation)) {
+        this.socket.emit('playerMovement', {
+             x: this.player.x,
+             y: this.player.y,
+             rotation: this.player.rotation,
+             velocity: this.player.body.velocity,
+             aVelocity: this.player.body.angularVelocity 
+        });
+       // }
  
+        /**
         // save old position data
         this.player.oldPosition = {
         x: this.player.x,
         y: this.player.y,
         rotation: this.player.rotation
-};
-
-
+        };
+*/
     }
 }
 
