@@ -47,7 +47,7 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('playerMoved', players[socket.id]);
   });
 
-  //console.log(players);
+  console.log(players);
 });
  
 server.listen(8081, function () {
