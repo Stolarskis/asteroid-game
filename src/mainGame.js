@@ -10,6 +10,7 @@ class mainGame extends Phaser.Scene {
 
   create() {
     //Game World Deminsions
+    console.log(this);
     this.worldHeight = 10000;
     this.worldWidth = 10000;
 
@@ -18,18 +19,19 @@ class mainGame extends Phaser.Scene {
     //This only works if the object's body is set to collide with boundries and onWorldsBounds is set to true.
 
     //Create physics group, objects will be added automatically when a bolt object is created
-    this.bolts = this.physics.add.group();
+    //    this.bolts = this.physics.add.group();
 
     //Add in parallax background layers
     this.createBackground();
 
-    this.asteroid = this.physics.add.sprite(
+    this.asteroid = this.matter.add.sprite(
+      this.matter.world,
       this.worldWidth / 2,
       this.worldHeight / 2,
       "large_asteroid",
       2
     );
-    this.physics.velocityFromRotation(50, 10, this.asteroid.body.velocity);
+    this.matter.applyForceFromAngle(this.asteroid.body.vel, 0.1, 0.01);
 
     this.asteroid.setScale(2);
     this.createPlayer();
@@ -56,20 +58,28 @@ class mainGame extends Phaser.Scene {
   speedController() {
     if (this.cursorKeys.up.isDown) {
       //Accelerate
+      /**
       this.physics.velocityFromRotation(
         this.player.rotation,
         250,
         this.player.body.acceleration
       );
+      */
+      //this.matter.applyForceFromAngle(this.player.rotation, 0.1, 0.01);
     } else if (this.cursorKeys.down.isDown) {
       //Decelerate
+      /**
       this.physics.velocityFromRotation(
         this.player.rotation,
         -250,
         this.player.body.acceleration
       );
+      */
+      //this.matter.applyForceFromAngle(this.player.rotation, 0.1, 0.01);
     } else {
+      /**
       this.player.setAcceleration(0);
+      */
     }
   }
   //Controlers player input for rotation
@@ -118,19 +128,15 @@ class mainGame extends Phaser.Scene {
   }
 
   createWorld(worldHeight, worldWidth) {
-    this.bounds = this.physics.world.setBounds(
-      0,
-      0,
-      this.worldWidth,
-      this.worldHeight,
-      true,
-      true,
-      true,
-      true
-    );
+    this.bounds = this.matter.world.setBounds({
+      setBounds: {
+        width: this.worldWidth,
+        height: this.worldHeight
+      }
+    });
     //Upon a collision with world boundries, delete whatever body comes in contact.
     //This only works if the object's body is set to collide with boundries and onWorldsBounds is set to true.
-    this.physics.world.on(
+    this.matter.world.on(
       "worldbounds",
       function(body) {
         body.gameObject.destroy();
@@ -195,7 +201,8 @@ class mainGame extends Phaser.Scene {
     this.playerMaxVelocity = 600;
     this.playerDrag = 0.99;
     //Create player in the center of the world
-    this.player = this.physics.add.sprite(
+    this.player = this.matter.add.sprite(
+      this.matter.world,
       this.worldWidth / 2,
       this.worldHeight / 2,
       "player_sprite"
@@ -208,11 +215,11 @@ class mainGame extends Phaser.Scene {
     this.cursorKeys = this.input.keyboard.createCursorKeys();
     //this.cursorKeys.space.setEmitOnRepeat(true);
     //Drag will use a damping effect rather than a linear approach. Much smoother brakes.
-    this.player.setDamping(true);
-    this.player.setDrag(this.playerDrag);
+    //this.player.setDamping(true);
+    //this.player.setDrag(this.playerDrag);
     //Used for the toggle in the dampener function
-    this.dampeners = true;
-    this.player.setMaxVelocity(this.playerMaxVelocity);
+    //this.dampeners = true;
+    //this.player.setMaxVelocity(this.playerMaxVelocity);
     this.player.setCollideWorldBounds(true);
   }
 }

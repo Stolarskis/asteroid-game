@@ -14,8 +14,7 @@ const config = {
   pixelArt: true,
   scene: [mainMenu, mainGame],
   physics: {
-    default: "arcade",
-    arcade: { debug: true }
+    default: "matter"
   }
 };
 
