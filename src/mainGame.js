@@ -10,7 +10,6 @@ class mainGame extends Phaser.Scene {
 
   create() {
     //Game World Deminsions
-    console.log(this);
     this.worldHeight = 10000;
     this.worldWidth = 10000;
 
@@ -31,7 +30,7 @@ class mainGame extends Phaser.Scene {
       "large_asteroid",
       2
     );
-    this.matter.applyForceFromAngle(this.asteroid.body.vel, 0.1, 0.01);
+    //this.matter.applyForceFromAngle(this.asteroid.body.vel, 0.1, 0.01);
 
     this.asteroid.setScale(2);
     this.createPlayer();
@@ -47,7 +46,7 @@ class mainGame extends Phaser.Scene {
   update() {
     this.speedController();
     this.directionController();
-    this.inertiaDampenerController();
+    //this.inertiaDampenerController();
     this.parallaxController();
     this.shootingController();
   }
@@ -65,6 +64,11 @@ class mainGame extends Phaser.Scene {
         this.player.body.acceleration
       );
       */
+      this.matter.applyForceFromAngle(
+        this.player.body,
+        0.01,
+        this.player.rotation
+      );
       //this.matter.applyForceFromAngle(this.player.rotation, 0.1, 0.01);
     } else if (this.cursorKeys.down.isDown) {
       //Decelerate
@@ -75,11 +79,13 @@ class mainGame extends Phaser.Scene {
         this.player.body.acceleration
       );
       */
-      //this.matter.applyForceFromAngle(this.player.rotation, 0.1, 0.01);
+      this.matter.applyForceFromAngle(
+        this.player.body,
+        -0.01,
+        this.player.rotation
+      );
     } else {
-      /**
-      this.player.setAcceleration(0);
-      */
+      this.player.body.acceleration = 0;
     }
   }
   //Controlers player input for rotation
@@ -202,7 +208,6 @@ class mainGame extends Phaser.Scene {
     this.playerDrag = 0.99;
     //Create player in the center of the world
     this.player = this.matter.add.sprite(
-      this.matter.world,
       this.worldWidth / 2,
       this.worldHeight / 2,
       "player_sprite"
@@ -220,7 +225,7 @@ class mainGame extends Phaser.Scene {
     //Used for the toggle in the dampener function
     //this.dampeners = true;
     //this.player.setMaxVelocity(this.playerMaxVelocity);
-    this.player.setCollideWorldBounds(true);
+    //this.player.setCollideWorldBounds(true);
   }
 }
 
