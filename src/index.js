@@ -14,7 +14,10 @@ const config = {
   pixelArt: true,
   scene: [mainMenu, mainGame],
   physics: {
-    default: "matter"
+    default: "matter",
+    matter: {
+      gravity: false
+    }
   }
 };
 

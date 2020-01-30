@@ -66,7 +66,7 @@ class mainGame extends Phaser.Scene {
       */
       this.matter.applyForceFromAngle(
         this.player.body,
-        0.01,
+        0.001,
         this.player.rotation
       );
       //this.matter.applyForceFromAngle(this.player.rotation, 0.1, 0.01);
@@ -81,7 +81,7 @@ class mainGame extends Phaser.Scene {
       */
       this.matter.applyForceFromAngle(
         this.player.body,
-        -0.01,
+        -0.001,
         this.player.rotation
       );
     } else {
