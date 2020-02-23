@@ -2,8 +2,8 @@ import { throws } from "assert";
 import { runInThisContext } from "vm";
 
 import Bolt from "./projectiles/Bolt.js";
-import LargeAsteroid from "./asteroids/LargeAsteroid.js";
 import AsteroidController from "./asteroids/AsteroidController.js";
+import PlayerHud from "./PlayerHud.js";
 
 class mainGame extends Phaser.Scene {
   constructor() {
@@ -12,13 +12,15 @@ class mainGame extends Phaser.Scene {
 
   create() {
     //Game World Deminsions
-    this.worldWidth = 1920;
-    this.worldHeight = 1080;
+    this.worldWidth = 800;
+    this.worldHeight = 600;
+    this.difficultyMultiplier = 5;
+    this.level = 1;
+    this.scoreIncrease = 30;
 
     this.createWorld(this.worldHeight, this.worldWidth);
     this.createBackground();
     this.createPlayer();
-    this.createGameOverOverlay();
 
     //Create physics group, objects will be added automatically when a bolt object/asteroid is created
     this.bolts = this.physics.add.group();
@@ -36,11 +38,9 @@ class mainGame extends Phaser.Scene {
 
     //Create asteroidController
     this.asteroidController = new AsteroidController();
+    this.createPlayerHUD();
 
     //Start Level 1
-    //Set Difficulty
-    this.difficultyMultiplier = 5;
-    this.level = 1;
     this.spawnWaveOfAsteroids(1);
   }
 
@@ -55,6 +55,7 @@ class mainGame extends Phaser.Scene {
       //Wait until wave is completed
       if (this.asteroids.getLength() === 0) {
         this.level += 1;
+        this.playerHud.updateLevel(this.level);
         this.spawnWaveOfAsteroids(this.level);
       }
     }
@@ -267,11 +268,12 @@ class mainGame extends Phaser.Scene {
     //Colliders are used to trigger functions when two objects collide
 
     //When a bolt collides with an asteroid, destroy that asteroid
-    this.physics.add.collider(
-      this.bolts,
-      this.asteroids,
-      this.boltAsteroidCollision
-    );
+    this.physics.add.collider(this.bolts, this.asteroids, (bolt, asteroid) => {
+      this.score += this.scoreIncrease;
+      this.playerHud.updateScore(this.score);
+      delete bolt.destroy();
+      asteroid.destroyAsteroid();
+    });
 
     //This allows asteroids to collide with one another rather than move through one another.
     this.physics.add.collider(this.asteroids, this.asteroids);
@@ -283,41 +285,10 @@ class mainGame extends Phaser.Scene {
       (player, asteroid) => {
         if (!this.disablePlayer) {
           this.killPlayer(player, asteroid, this);
-          this.displayOverlay(this);
+          this.playerHud.displayGameOverOverlay(this);
         }
       }
     );
-  }
-
-  displayOverlay(scene) {
-    scene.gameOverOverlay.gameOverText.visible = true;
-    scene.gameOverOverlay.restartButton.visible = true;
-  }
-
-  boltAsteroidCollision(bolt, asteroid) {
-    delete bolt.destroy();
-    asteroid.destroyAsteroid();
-  }
-
-  createGameOverOverlay() {
-    //  Our Text object to display the Score
-    let gameOverText = this.add.text(window.innerWidth / 2, 100, "Game Over", {
-      font: "50px Arial"
-    });
-    gameOverText.setScrollFactor(0);
-    gameOverText.visible = false;
-
-    //HACKY = Having trouble with UI scaling. Currently using manual offsets to make it look nicer.
-    //Its not perfect and will need to replaced in future.
-    let restartButton = this.add.text(
-      window.innerWidth / 2 + 25,
-      200,
-      "Press Enter To Restart"
-    );
-    restartButton.setScrollFactor(0);
-    restartButton.visible = false;
-
-    this.gameOverOverlay = { gameOverText, restartButton };
   }
 
   spawnWaveOfAsteroids(level) {
@@ -325,6 +296,11 @@ class mainGame extends Phaser.Scene {
       this,
       level * this.difficultyMultiplier
     );
+  }
+  createPlayerHUD() {
+    this.score = 0;
+    this.lives = 3;
+    this.playerHud = new PlayerHud(this);
   }
 }
 
