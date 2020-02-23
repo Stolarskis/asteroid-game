@@ -31,15 +31,12 @@ class PlayerHud {
       })
       .setScrollFactor(0);
 
-    //  Our Text object to display the Score
     let gameOverText = scene.add.text(275, 100, "Game Over", {
       font: "50px Arial"
     });
     gameOverText.setScrollFactor(0);
     gameOverText.visible = false;
 
-    //HACKY = Having trouble with UI scaling. Currently using manual offsets to make it look nicer.
-    //Its not perfect and will need to replaced in future.
     let restartText = scene.add.text(300, 200, "Press Enter To Restart");
     restartText.setScrollFactor(0);
     restartText.visible = false;
