@@ -108,8 +108,6 @@ class mainGame extends Phaser.Scene {
     }
   }
 
-  setupShootingEvent() {}
-
   //Toggles player drag on and off
   inertiaDampenerController() {
     if (this.cursorKeys.shift.isDown) {
