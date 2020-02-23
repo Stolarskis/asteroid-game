@@ -17,6 +17,7 @@ class mainGame extends Phaser.Scene {
     this.difficultyMultiplier = 5;
     this.level = 1;
     this.scoreIncrease = 30;
+    this.bulletFrequency = 75;
 
     this.createWorld(this.worldHeight, this.worldWidth);
     this.createBackground();
@@ -42,6 +43,9 @@ class mainGame extends Phaser.Scene {
 
     //Start Level 1
     this.spawnWaveOfAsteroids(1);
+
+    //Used to space out time between shots for shooting controller method
+    this.bulletTime = this.time.now;
   }
 
   update() {
@@ -98,10 +102,13 @@ class mainGame extends Phaser.Scene {
   shootingController() {
     //Working solution to not allowing the player to just hold the down key.
     //Later on I want to implement a recharging ammo system. But thats for a later day
-    if (Phaser.Input.Keyboard.JustDown(this.cursorKeys.space)) {
+    if (this.cursorKeys.space.isDown && this.bulletTime <= this.time.now) {
+      this.bulletTime = this.time.now + this.bulletFrequency;
       new Bolt(this);
     }
   }
+
+  setupShootingEvent() {}
 
   //Toggles player drag on and off
   inertiaDampenerController() {
