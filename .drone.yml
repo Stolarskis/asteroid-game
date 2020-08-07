@@ -12,3 +12,4 @@ steps:
       repo:
         from_secret: repoUrl
       tags: latest
+      debug: true
