@@ -12,4 +12,4 @@ steps:
       repo:
         from_secret: repo
       debug: true
-      tag: latest
+      autotag: true
