@@ -1,4 +1,3 @@
----
 kind: pipeline
 name: default
 
@@ -12,5 +11,5 @@ steps:
         from_secret: password
       repo:
         from_secret: repoUrl
-      tags: latest
       debug: true
+      autotag: true
