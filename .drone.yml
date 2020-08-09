@@ -11,4 +11,5 @@ steps:
         from_secret: password
       repo:
         from_secret: repo
-      autotag: true
+      debug: true
+      tag: latest
