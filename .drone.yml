@@ -2,14 +2,13 @@ kind: pipeline
 name: default
 
 steps:
-- name: asteroid-game
-  image: plugins/docker
-  settings:
-    username:
-      from_secret: username
-    password:
-      from_secret: password
-    repo:
-      from_secret: repo
-    debug: true
-    autotag: true
+  - name: asteroid-game
+    image: plugins/docker
+    settings:
+      username:
+        from_secret: username
+      password:
+        from_secret: password
+      repo:
+        from_secret: repo
+      autotag: true
