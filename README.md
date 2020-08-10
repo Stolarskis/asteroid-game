@@ -1,7 +1,5 @@
 # Asteroid-Game
 
-Play the game via [heroku](https://calm-wave-56621.herokuapp.com/)
-
 ## Build Steps
 
 1. `npm install`
