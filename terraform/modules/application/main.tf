@@ -30,14 +30,15 @@ resource "aws_instance" "asteroid_game" {
     application_name = "${var.application_name}"
   }
 
+  //Allows ansible to ssh into the instance
   provisioner "remote-exec" {
     inline = ["echo 'Hello World'"]
 
     connection {
       host        = aws_instance.asteroid_game.public_ip
       type        = "ssh"
-      user        = "${var.ssh_user}"
-      private_key = "${file("${var.private_key_path}")}"
+      user        = var.ssh_user
+      private_key = file(var.private_key_path)
     }
   }
 
