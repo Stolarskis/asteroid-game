@@ -159,7 +159,22 @@ resource "aws_lb_target_group" "asteroid_game" {
 }
 
 resource "aws_lb_target_group_attachment" "asteroid_game" {
-  target_group_arn = "${aws_lb_target_group.asteroid_game.arn}"
-  target_id        = "${var.ec2_id}"
+  target_group_arn = aws_lb_target_group.asteroid_game.arn
+  target_id        = var.ec2_id
   port             = 80
 }
+
+data "aws_route53_zone" "asteroid_game_zone"{
+  name             = var.route_zone_name
+}
+
+resource "aws_route53_record" "asteroid_game_record"{
+  zone_id = data.aws_route53_zone.asteroid_game_zone.id
+  name    = "asteroid-game-record"
+  type    = "CNAME"
+  ttl     = "5"
+
+  records        = [aws_lb.asteroid_game_lb.dns_name]
+}
+
+

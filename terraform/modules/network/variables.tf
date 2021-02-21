@@ -3,6 +3,10 @@ variable "user_ip" {
   description = "User's public ip to only allow ssh from that ip"
 }
 
+#variable "vpc_id"{
+#  type = string
+#}
+
 variable "vpc_cidr" {
   type = string
 }
@@ -21,4 +25,8 @@ variable "azs" {
 
 variable "ec2_id" {
   type = string
+}
+
+variable "route_zone_name"{
+  default = "asteroid-game.com"
 }
